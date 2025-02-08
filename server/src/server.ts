@@ -1,17 +1,27 @@
-// TODO: Create Sequelize connector from models folder and import in to connect to postgres server. 
-
 import express from 'express';
-import routes from './routes/index.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { sequelize } from './config/database';
+import authRoutes from './routes/authRoutes';
+import bookRoutes from './routes/bookRoutes';
+import reviewRoutes from './routes/reviewRoutes';
+import favoriteRoutes from './routes/favoriteRoutes';
+import recommendationRoutes from './routes/recommendationRoutes';
 
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
-// Serves static files in the entire client's dist folder
-app.use(express.static('../client/dist'));
-
+app.use(cors());
 app.use(express.json());
-app.use(routes);
+app.use('/api/auth', authRoutes);
+app.use('/api/books', bookRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
+sequelize.sync().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });
