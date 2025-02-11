@@ -9,11 +9,11 @@ export default defineConfig({
     port: 5173,
     open: true,
     proxy: {
-      "/api/auth": {
-    target: "http://localhost:5000",
-    changeOrigin: true,
-    secure: false,
-     },
-    }
+      "/api": {
+        target: "https://team-book-it.onrender.com", // Your deployed backend URL
+        changeOrigin: true,
+        secure: true,
+      },
+    },
   },
 })

@@ -8,18 +8,20 @@ interface Book {
   author: string;
 }
 
-const Hero = () => {
+const Home_API = () => {
   const [books, setBooks] = useState<Book[]>([]);
 
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
-        console.log(":pushpin: Fetching NYT Best Sellers...");
-        const response = await axios.get("http://localhost:5000/api/books/nyt-bestsellers");
-        console.log(":books: Books Fetched:", response.data);
+        console.log("📌 Fetching NYT Best Sellers...");
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/books/nyt-bestsellers`
+        );
+        console.log("📚 Books Fetched:", response.data);
         setBooks(response.data);
       } catch (error) {
-        console.error(":x: Error fetching bestsellers:", error);
+        console.error("❌ Error fetching bestsellers:", error);
       }
     };
     fetchBestSellers();
@@ -43,7 +45,7 @@ const Hero = () => {
                 alt={book.title}
                 className="w-full h-[250px] object-cover border border-black rounded-md"
               />
-              <h3 className="text-lg font-bold mt-4">{book.title}</h3>
+              <h3 className="text-md font-bold mt-4">{book.title}</h3>
               <p className="text-sm text-gray-300">By {book.author}</p>
               <p className="text-xs mt-2">Click to buy on Amazon</p>
             </a>
@@ -56,4 +58,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;
+export default Home_API;
