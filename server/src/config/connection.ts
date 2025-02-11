@@ -3,9 +3,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const DB_URL = process.env.RENDER ? process.env.DB_URL_REMOTE : process.env.DB_URL_LOCAL;
+// ✅ Debugging: Log DB_URL to check if it's being read
+console.log("🔍 DB_URL:", process.env.DB_URL || "❌ NOT FOUND");
 
-const sequelize = new Sequelize(DB_URL as string, {
+const sequelize = new Sequelize(process.env.DB_URL as string, {
   dialect: "postgres",
   dialectOptions: {
     ssl: {
