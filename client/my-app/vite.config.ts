@@ -6,14 +6,18 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 5173,
+    port: 5173,  // Local Dev
     open: true,
     proxy: {
       "/api": {
-        target: "https://team-book-it.onrender.com", // Your deployed backend URL
+        target: "https://team-book-it.onrender.com", // Backend URL
         changeOrigin: true,
         secure: true,
       },
     },
+  },
+  preview: {
+    port: 4173, // Ensure Render can detect this port
+    open: true,
   },
 })
