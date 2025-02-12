@@ -12,10 +12,15 @@ console.log("📌 Loaded JWT_SECRET:", process.env.JWT_SECRET); // ✅ Debugging
 
 const app = express();
 
-// ✅ Enable CORS for frontend access
+// ✅ Allow both local development and deployed frontend on Render
+const allowedOrigins = [
+  "http://localhost:5173", // Local development
+  "https://team-book-it-993b.onrender.com", // Deployed frontend on Render
+];
+
 app.use(cors({
-  origin: "http://localhost:5173", // Allow frontend to access backend
-  credentials: true
+  origin: allowedOrigins,
+  credentials: true // Allows sending cookies (if needed)
 }));
 
 app.use(express.json());
@@ -27,6 +32,10 @@ app.use("/api/favorites", favoriteRoutes);
 app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
+
+// ✅ Ensure database connection before starting the server
 sequelize.sync().then(() => {
   app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+}).catch(error => {
+  console.error("❌ Database connection failed:", error);
 });
