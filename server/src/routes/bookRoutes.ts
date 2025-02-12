@@ -6,7 +6,7 @@ import Book from "../models/Book";
 dotenv.config();
 const router = express.Router();
 
-// ✅ Debugging Middleware: Log requests to books route
+// ✅ Middleware: Log requests for debugging
 router.use((req, res, next) => {
   console.log(`📌 [${req.method}] ${req.originalUrl}`);
   next();
@@ -16,59 +16,65 @@ router.use((req, res, next) => {
 router.get("/nyt-bestsellers", async (req, res) => {
   try {
     const apiKey = process.env.NYT_API_KEY;
-    console.log("📌 NYT API Key:", process.env.NYT_API_KEY);
+    console.log("📌 NYT API Key:", apiKey ? "✅ Loaded" : "❌ MISSING");
+
     if (!apiKey) {
       return res.status(500).json({ error: "NYT API key is missing in environment variables." });
     }
 
-    // 🔹 Fetch bestsellers from NYT API
-    const response = await axios.get(
-      `https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json?api-key=${apiKey}`
-    );
+    const nytUrl = `https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json?api-key=${apiKey}`;
+    const response = await axios.get(nytUrl);
 
-    // Extract relevant data
+    if (!response.data.results?.books) {
+      console.error("⚠️ Unexpected NYT API response:", response.data);
+      return res.status(500).json({ error: "Invalid response from NYT API" });
+    }
+
+    // Extract relevant book data
     const books = response.data.results.books.map((book: any) => ({
       title: book.title,
       author: book.author,
       description: book.description,
-      image: book.book_image, // NYT provides book images
-      buyLink: book.amazon_product_url, // Direct Amazon link
+      image: book.book_image, // NYT book image
+      buyLink: book.amazon_product_url, // Amazon purchase link
     }));
 
-    res.json(books.slice(0, 10)); // Return top 10 books only
+    res.json(books.slice(0, 10)); // Return top 10 books
   } catch (error) {
     console.error("❌ Error fetching NYT bestsellers:", error);
     res.status(500).json({ error: "Failed to fetch NYT bestsellers" });
   }
 });
 
-// ✅ Fetch Top 10 Books from Google Books API (Proxied via Backend)
+// ✅ Fetch Books from Google Books API (Dynamically Searchable)
 router.get("/google-books", async (req, res) => {
   try {
-    const query = req.query.q || "bestsellers"; // Default query if none provided
-    const apiKey = process.env.GOOGLE_BOOKS_API_KEY; // Securely get API key from backend
-
-    console.log("📌 Loaded API Key:", apiKey ? "✅ Key Loaded" : "❌ Key Missing"); // Debugging log
+    const query = req.query.q as string || "bestsellers";
+    const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
+    console.log("📌 Google Books API Key:", apiKey ? "✅ Loaded" : "❌ MISSING");
 
     if (!apiKey) {
       return res.status(500).json({ error: "Google Books API key is missing in environment variables." });
     }
 
     const maxResults = 12;
-    const response = await axios.get(
-      `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${apiKey}&maxResults=${maxResults}`
-    );
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${apiKey}&maxResults=${maxResults}`;
+    const response = await axios.get(googleBooksUrl);
 
-    console.log(`📚 Fetched ${response.data.items?.length || 0} books from Google Books API`);
-    res.json(response.data.items || []); // Send only the books list
+    if (!response.data.items) {
+      console.warn("⚠️ No books found in Google Books API response.");
+      return res.json([]); // Return an empty array if no books found
+    }
+
+    console.log(`📚 Fetched ${response.data.items.length} books from Google Books API`);
+    res.json(response.data.items);
   } catch (error) {
     console.error("❌ Error fetching books:", error);
     res.status(500).json({ error: "Failed to fetch books from Google Books API" });
   }
 });
 
-
-// ✅ GET all stored books (from PostgreSQL)
+// ✅ GET all stored books (PostgreSQL)
 router.get("/", async (req, res) => {
   try {
     const books = await Book.findAll();
@@ -92,14 +98,14 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ✅ POST a new book (Saved to PostgreSQL)
+// ✅ POST a new book (Save to PostgreSQL)
 router.post("/", async (req, res) => {
   try {
     const { title, author, description, apiId } = req.body;
     if (!title || !author || !apiId) {
       return res.status(400).json({ error: "Missing required fields" });
     }
-    
+
     const newBook = await Book.create({ title, author, description, apiId });
     console.log("📌 New book added to database:", newBook);
     res.status(201).json(newBook);

@@ -9,7 +9,7 @@ get favorite book recommendations. The app integrates with the different API to 
 details and provides a platform for users to share their reading experiences. Users can create 
 accounts, favorite books, and explore recommendations based on their reading preferences.
 ## App Link
-📽️- [Deploy Link of Book-It application](https://team-book-it.onrender.com/) <br/>
+📽️- [Deploy Link of Book-It application](https://team-book-it-993b.onrender.com/) <br/>
 ## 🎨 **Mock-Up**
 ![alt text](Mockup-pic-Book-App.png)
 ### Table of Contents 📋

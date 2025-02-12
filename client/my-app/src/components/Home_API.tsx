@@ -8,22 +8,26 @@ interface Book {
   author: string;
 }
 
-const Hero = () => {
+const Home_API = () => {
   const [books, setBooks] = useState<Book[]>([]);
+  
+  // Use environment variable for API URL
+  const NYT_API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
-        console.log(":pushpin: Fetching NYT Best Sellers...");
-        const response = await axios.get("http://localhost:5000/api/books/nyt-bestsellers");
-        console.log(":books: Books Fetched:", response.data);
+        console.log("📌 Fetching NYT Best Sellers...");
+        const response = await axios.get(`${NYT_API_BASE_URL}/api/books/nyt-bestsellers`);
+        console.log("📚 Books Fetched:", response.data);
         setBooks(response.data);
       } catch (error) {
-        console.error(":x: Error fetching bestsellers:", error);
+        console.error("❌ Error fetching bestsellers:", error);
       }
     };
     fetchBestSellers();
-  }, []);
+  }, [NYT_API_BASE_URL]);  // ✅ Include it if necessary
+  
 
   return (
     <div className="bg-[#B99976] text-center p-10">
@@ -56,4 +60,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;
+export default Home_API;
