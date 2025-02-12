@@ -12,20 +12,26 @@ console.log("📌 Loaded JWT_SECRET:", process.env.JWT_SECRET); // ✅ Debugging
 
 const app = express();
 
-// ✅ Allow both local development and deployed frontend on Render
+// ✅ Allow multiple origins dynamically (fix for CORS)
 const allowedOrigins = [
   "http://localhost:5173", // Local development
   "https://team-book-it-993b.onrender.com", // Deployed frontend on Render
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true // Allows sending cookies (if needed)
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS policy does not allow this origin."));
+    }
+  },
+  credentials: true // Allows cookies (if needed)
 }));
 
 app.use(express.json());
 
-// Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/favorites", favoriteRoutes);
