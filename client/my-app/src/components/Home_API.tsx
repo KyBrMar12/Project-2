@@ -31,7 +31,7 @@ const Home_API = () => {
 
   return (
     <div className="bg-[#B99976] text-center p-10">
-      <h2 className="text-4xl font-bold mb-6">Top NYT Best Sellers</h2>
+      <h2 className="text-4xl font-bold mb-6">This Weeks Top NYT Best Sellers</h2>
       <div className="flex flex-wrap justify-center gap-6">
         {books.length > 0 ? (
           books.map((book, index) => (
